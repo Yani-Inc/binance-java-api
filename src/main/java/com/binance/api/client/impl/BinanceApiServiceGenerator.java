@@ -16,6 +16,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,18 +24,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class BinanceApiServiceGenerator {
 
-    private static final OkHttpClient sharedClient;
+    private static OkHttpClient sharedClient;
     private static final Converter.Factory converterFactory = JacksonConverterFactory.create();
 
-    static {
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequestsPerHost(500);
-        dispatcher.setMaxRequests(500);
-        sharedClient = new OkHttpClient.Builder()
-                .dispatcher(dispatcher)
-                .pingInterval(20, TimeUnit.SECONDS)
-                .build();
+    public static void setupOkHttpClient(Proxy proxy) {
+        if (sharedClient == null) {
+            Dispatcher dispatcher = new Dispatcher();
+            dispatcher.setMaxRequestsPerHost(500);
+            dispatcher.setMaxRequests(500);
+            sharedClient = new OkHttpClient.Builder()
+                    .dispatcher(dispatcher)
+                    .proxy(proxy)
+                    .pingInterval(20, TimeUnit.SECONDS)
+                    .build();
+        }
     }
+
+    public static void setupOkHttpClient() {
+        setupOkHttpClient(null);
+    }
+
 
     @SuppressWarnings("unchecked")
     private static final Converter<ResponseBody, BinanceApiError> errorBodyConverter =
@@ -66,6 +75,7 @@ public class BinanceApiServiceGenerator {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(converterFactory);
+        setupOkHttpClient();
 
         if (StringUtils.isEmpty(apiKey) || StringUtils.isEmpty(secret)) {
             retrofitBuilder.client(sharedClient);
@@ -108,6 +118,7 @@ public class BinanceApiServiceGenerator {
      * Returns the shared OkHttpClient instance.
      */
     public static OkHttpClient getSharedClient() {
+        setupOkHttpClient();
         return sharedClient;
     }
 }
