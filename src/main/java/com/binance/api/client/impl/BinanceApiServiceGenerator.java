@@ -36,6 +36,9 @@ public class BinanceApiServiceGenerator {
                     .dispatcher(dispatcher)
                     .proxy(proxy)
                     .pingInterval(20, TimeUnit.SECONDS)
+                    .connectTimeout(20, TimeUnit.SECONDS)
+                    .readTimeout(20, TimeUnit.SECONDS)
+                    .writeTimeout(20, TimeUnit.SECONDS)
                     .build();
         }
     }
