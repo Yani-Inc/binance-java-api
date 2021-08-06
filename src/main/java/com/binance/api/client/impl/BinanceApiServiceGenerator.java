@@ -28,7 +28,7 @@ public class BinanceApiServiceGenerator {
     private static final Converter.Factory converterFactory = JacksonConverterFactory.create();
 
     public static void setupOkHttpClient(Proxy proxy) {
-        if (sharedClient == null) {
+        if (sharedClient == null || proxy != null) {
             Dispatcher dispatcher = new Dispatcher();
             dispatcher.setMaxRequestsPerHost(500);
             dispatcher.setMaxRequests(500);
