@@ -4,6 +4,7 @@ import com.binance.api.client.BinanceApiError;
 import com.binance.api.client.config.BinanceApiConfig;
 import com.binance.api.client.exception.BinanceApiException;
 import com.binance.api.client.security.AuthenticationInterceptor;
+import okhttp3.Authenticator;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -27,7 +28,7 @@ public class BinanceApiServiceGenerator {
     private static OkHttpClient sharedClient;
     private static final Converter.Factory converterFactory = JacksonConverterFactory.create();
 
-    public static void setupOkHttpClient(Proxy proxy) {
+    public static void setupOkHttpClient(Proxy proxy, Authenticator proxyAuthenticator) {
         if (sharedClient == null || proxy != null) {
             Dispatcher dispatcher = new Dispatcher();
             dispatcher.setMaxRequestsPerHost(500);
@@ -39,12 +40,13 @@ public class BinanceApiServiceGenerator {
                     .connectTimeout(20, TimeUnit.SECONDS)
                     .readTimeout(20, TimeUnit.SECONDS)
                     .writeTimeout(20, TimeUnit.SECONDS)
+                    .proxyAuthenticator(proxyAuthenticator)
                     .build();
         }
     }
 
     public static void setupOkHttpClient() {
-        setupOkHttpClient(null);
+        setupOkHttpClient(null, null);
     }
 
 
