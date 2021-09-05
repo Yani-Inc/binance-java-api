@@ -33,15 +33,19 @@ public class BinanceApiServiceGenerator {
             Dispatcher dispatcher = new Dispatcher();
             dispatcher.setMaxRequestsPerHost(500);
             dispatcher.setMaxRequests(500);
-            sharedClient = new OkHttpClient.Builder()
+
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .dispatcher(dispatcher)
                     .proxy(proxy)
                     .pingInterval(20, TimeUnit.SECONDS)
                     .connectTimeout(20, TimeUnit.SECONDS)
                     .readTimeout(20, TimeUnit.SECONDS)
-                    .writeTimeout(20, TimeUnit.SECONDS)
-                    .proxyAuthenticator(proxyAuthenticator)
-                    .build();
+                    .writeTimeout(20, TimeUnit.SECONDS);
+
+            if (proxyAuthenticator != null) {
+                builder.proxyAuthenticator(proxyAuthenticator);
+            }
+            sharedClient = builder.build();
         }
     }
 
